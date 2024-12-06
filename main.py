@@ -107,6 +107,74 @@ def plot_star_map_3d(visible_stars):
     # Show the plot
     fig.show()
 
+def plot_star_map_3d_clear(visible_stars):
+    # Scale and spread stars across a larger sphere
+    x_coords = []
+    y_coords = []
+    z_coords = []
+    star_names = []
+
+    for hip_id, alt, az in visible_stars:
+        # Scale the radius (simulate distance) to spread stars out
+        r = random.uniform(1, 10)  # Randomize distance for better distribution
+        x = r * np.cos(np.radians(alt)) * np.cos(np.radians(az))
+        y = r * np.cos(np.radians(alt)) * np.sin(np.radians(az))
+        z = r * np.sin(np.radians(alt))
+
+        x_coords.append(x)
+        y_coords.append(y)
+        z_coords.append(z)
+        star_names.append(f"HIP {hip_id}")
+
+    # Create 3D scatter plot
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatter3d(
+        x=x_coords,
+        y=y_coords,
+        z=z_coords,
+        mode='markers',
+        marker=dict(
+            size=3,
+            color=z_coords,  # Use z-coordinate for color mapping
+            colorscale='Cividis',  # A night-sky-friendly colorscale
+            opacity=0.8
+        ),
+        text=star_names,  # Display HIP ID on hover
+        hoverinfo='text'
+    ))
+
+    # Add a spherical grid to simulate the sky dome
+    u = np.linspace(0, 2 * np.pi, 100)
+    v = np.linspace(0, np.pi, 100)
+    sphere_x = 10 * np.outer(np.cos(u), np.sin(v))
+    sphere_y = 10 * np.outer(np.sin(u), np.sin(v))
+    sphere_z = 10 * np.outer(np.ones(np.size(u)), np.cos(v))
+
+    fig.add_trace(go.Surface(
+        x=sphere_x,
+        y=sphere_y,
+        z=sphere_z,
+        opacity=0.1,
+        showscale=False,
+        colorscale='Blues'
+    ))
+
+    # Customize layout
+    fig.update_layout(
+        title="Enhanced 3D Star Map",
+        scene=dict(
+            xaxis=dict(title="Azimuth", showgrid=False, zeroline=False),
+            yaxis=dict(title="Altitude", showgrid=False, zeroline=False),
+            zaxis=dict(title="Elevation", showgrid=False, zeroline=False),
+            aspectmode="cube",  # Maintain aspect ratio
+        ),
+        margin=dict(l=0, r=0, b=0, t=50)
+    )
+
+    # Show the plot
+    fig.show()
+
 
 if __name__ == "__main__":
     try:
@@ -133,7 +201,10 @@ if __name__ == "__main__":
         # plot_star_map(visible_stars)
 
         # Plot star map
-        plot_star_map_3d(visible_stars)
+        # plot_star_map_3d(visible_stars)
+
+        # Plot star map
+        plot_star_map_3d_clear(visible_stars)
 
     except Exception as e:
         print(f"Error: {e}")
