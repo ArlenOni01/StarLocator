@@ -5,6 +5,7 @@ import numpy as np
 from datetime import datetime
 from skyfield.data import hipparcos
 import plotly.graph_objects as go
+import random
 
 # Function to get the coordinates for a given city
 def get_coordinates(city):
